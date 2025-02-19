@@ -27,37 +27,3 @@ The DCS-930 and 930L still function, but outdated firmware and a lack of softwar
 This repo aims to return some usability to these cameras, reimplement the web portal, document interesting things about the cameras, and, eventually, add features so these cameras can serve as an incredibly cheap option for hobby projects.
 
 
-## Accessing the Web Interface
-
-
-
-The web interface is accessed using HTTP. Toss `http://[camera.IPv4.address]` into a browser and then sign in with HTTP basic auth. 
-
-Attempting to access it from a headless client without an authorization header will fail with a 401 error. Attempting to access it from a modern browser (ig. not IE or Safari) will return this page instead:
-
-<img src="./use_ie_nerd.png">
-
- I've gotten **so** tired of spinning up the Windows XP VM when I need to change the settings for the 930.
-
-In order to ease access, use the `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)` user agent with your browser's development tools to access it on a modern Chromium-based browser.
-
-# Authorization
-
-When using this User Agent, Chromium sends a request roughly equivalent to this:
-
-```PowerShell
-$session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-$session.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)"
-Invoke-WebRequest -UseBasicParsing -Uri "" `
--WebSession $session `
--Headers @{
-"Accept"="text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
-  "Accept-Encoding"="gzip, deflate"
-  "Accept-Language"="en-US,en;q=0.9"
-  "Authorization"="Digest username=`"`", realm=`"`", nonce=`"`", uri=`"/`", response=`"`", qop=auth, nc=, cnonce=`"`""
-  "DNT"="1"
-  "Upgrade-Insecure-Requests"="1"
-}
-```
-
-Only the authorization header is required to get 200.
